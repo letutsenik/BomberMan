@@ -1,0 +1,521 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+body {
+    font-family: 'Indie Flower', cursive; /* Гарнитура шрифта */
+    background-color: #ceced2;
+    text-align: center;
+}
+.main {
+
+}
+/***************************/
+.prompt-wrapper {
+    display: none;
+    width: 25vw;
+    height: 10vw;
+    margin: 15vw auto 0;
+    border: 1px solid grey;
+    border-radius: 1vw;
+    font-size: 2vw;
+    text-align: center;
+    background-color: #decc4d;
+    z-index: 9999;
+}
+.prompt-wrapper input[type=text] {
+    display: block;
+    width: 15vw;
+    height: 3vw;
+    margin: 0 auto;
+    border: 2px solid blue;
+    border-radius: 0.5vw;
+    font-size: 2vw;
+}
+.prompt-wrapper input[type=text]:focus {
+    outline: none;
+    border: 2px solid red;
+}
+.prompt-wrapper-ok {
+    display: block;
+    width: 10vw;
+    height: 3vw;
+    margin: 0.5vw auto;
+    border-radius: 1vw;
+    font-size: 2vw;
+}
+.prompt-wrapper-ok:focus {
+    outline: none;
+}
+
+/****************************************/
+.main-logo {
+    width: 45vw;
+    height: 15vw;
+    margin: 2vw auto 0;
+    /*margin-left: auto;
+    margin-right: auto;*/
+    background: url(../images/title_titletext.png) no-repeat; /*center fixed;*/
+    background-size: cover;
+
+    display: none;
+}
+
+.info-wrapper {
+    height: 25vw;
+    width: 80vw;
+    margin: 0 auto;
+    background-color: #737070;
+    border-radius: 1vw;
+    display: none;
+    padding: 2vw 2vw;
+    color: #ffffff;
+    font-size: 2vw;
+    text-align: justify;
+    /*animation: MyAnimation 1s linear infinite;*/
+}
+.info-wrapper h2, .info-wrapper p, .info-wrapper h3 {
+    margin: 1vw;
+}
+.record-wrapper {
+    display: none;
+    height: 25vw;
+    width: 80vw;
+    margin: 2vw auto;
+    text-align: center;
+
+}
+    .record-table {
+        width: 50vw;
+        margin: 0 auto;
+        font-size: 2vw;
+
+    }
+
+    .record-table table, .record-table th, .record-table td {
+        border: 3px solid black;
+        background-color: #decc4d;
+    }
+    .record-table caption {
+        font-weight: bold;
+        font-size: 3vw;
+    }
+
+    .record-table tr:hover {background-color: #596567}
+
+.menu-wrapper {
+    margin-top: 3vw;
+}
+
+.main-menu {
+    /*display: none;*/
+}
+
+.main-menu ul {
+    list-style-type: none;
+}
+
+.main-menu li {
+    margin: 0 auto;
+    width: 25vw;
+}
+
+.main-menu li a {
+    display: block;
+    color: #ffffff;
+    padding: 0.5vw 1vw;
+    text-decoration: none;
+    font-size: 3vw; /* Размер текста */
+}
+
+.main-menu li a:hover {
+    color: #f8522c;
+}
+
+.gamestatus {
+    position: absolute;
+    display: none;
+    left: calc(50% - 40vw);
+    top: calc(50% - 10vh);
+    width: 80vw;
+    height: 20vh;
+    line-height: 20vh;
+    text-align: center;
+
+    font-size: 6vw; /* Размер текста */
+    color: white;
+}
+.gamestatus span {
+    font-size: 8vw; /* Размер текста */
+}
+
+
+.if-portrait {
+    display: none;
+}
+.game {
+    display: none;
+    position: relative;
+    overflow: hidden;
+    /*max-height: 100vh;*/
+}
+
+.info {
+    position: relative;
+    /*border: 1px solid green;*/
+    min-width: 100vw;
+    height: 10vh;
+    line-height: 10vh;
+    font-size: 3vw;
+}
+.info td {
+    width: 33%;
+}
+
+.scene {
+    position: relative;
+    margin-left: 0;
+    width: 251vh;
+    height: 89vh;
+    /*background-color: #0bb471;*/
+    background-color: rgba(68, 85, 57, 1);
+
+    transform: translateZ(0);
+    will-change: transform;
+}
+.scene-animated-move {
+    transition-property: margin-left;
+    transition-duration: 2s;
+}
+.bomberman {
+    position: absolute;
+    display: none;
+    z-index: 1000;
+
+    /*transform: translateZ(0);
+    will-change: transform;*/
+}
+.bomb {
+    position: absolute;
+    display: none;
+}
+.flame {
+    position: absolute;
+    display: none;
+}
+.ghost {
+    position: absolute;
+
+    /*transform: translateZ(0);
+    will-change: transform;*/
+}
+.block {
+    position: absolute;
+
+    /*transform: translateZ(0);
+    will-change: transform;*/
+}
+
+.controls {
+    display: none;
+}
+.controls-bomb {
+    display: none;
+}
+@media (max-width: 1200px) /*and (max-width: 600px)*/ {
+    .info-wrapper {
+        height: 25vw;
+        width: 80vw;
+        margin: 0 auto;
+        background-color: #737070;
+        border-radius: 1vw;
+        display: none;
+        padding: 2vw 2vw;
+        color: #ffffff;
+        font-size: 2vw;
+        text-align: justify;
+        /*animation: MyAnimation 1s linear infinite;*/
+    }
+    .info-wrapper h2, .info-wrapper p, .info-wrapper h3 {
+        margin: 1.5vw;
+    }
+
+    .menu-wrapper {
+        margin-top: 3vw;
+    }
+    .main-menu ul {
+        list-style-type: none;
+    }
+
+    .main-menu li {
+        margin: 0 auto;
+        width: 35vw;
+    }
+    .main-menu li a {
+        display: block;
+        color: #ffffff;
+        padding: 0.5vw 1vw;
+        text-decoration: none;
+        font-size: 5vw; /* Размер текста */
+    }
+
+    .scene {
+        position: relative;
+        margin-left: 25vw;
+        /*border: 1px solid blue;*/
+        width: 251vh;
+        height: 89vh;
+
+        transform: translateZ(0);
+        will-change: transform;
+    }
+
+    .scene-animated-move {
+        transition-property: margin-left;
+        transition-duration: 2s;
+    }
+
+    .bomberman {
+        position: absolute;
+        display: none;
+        z-index: 1000;
+
+        /*transform: translateZ(0);
+        will-change: transform;*/
+    }
+    .bomb {
+        position: absolute;
+        display: none;
+    }
+    .flame {
+        position: absolute;
+        display: none;
+    }
+    .ghost {
+        position: absolute;
+
+        /*transform: translateZ(0);
+        will-change: transform;*/
+    }
+    .block {
+        position: absolute;
+        /*transform: translateZ(0);
+        will-change: transform;*/
+    }
+
+    .controls {
+        display: block;
+        position: absolute;
+        top: 50vh;
+        left: 1vw;
+        width: 23vw;
+        height: 23vw;
+        border-radius: 50%;
+        background-color: gray;
+        opacity: 0.5;
+        /*border: 1px solid red;*/
+    }
+    .controls-button {
+        position: absolute;
+
+        width: 7vw;
+        height: 7vw;
+        background-color: #f8522c;
+    }
+    .controls .up {
+        border-radius: 1vw;
+        left: calc(50% - 3.5vw);
+        top: 1vw;
+    }
+    .controls .right {
+        border-radius: 1vw;
+        left: calc(100% - 8vw);
+        top: calc(50% - 3.5vw);
+    }
+    .controls .down {
+        border-radius: 1vw;
+        left: calc(50% - 3.5vw);
+        top: calc(100% - 8vw);
+    }
+    .controls .left {
+        border-radius: 1vw;
+        left: 1vw;
+        top: calc(50% - 3.5vw);
+    }
+    .controls-button-pressed {
+        background-color: yellow;
+    }
+
+    .controls-bomb {
+        display: block;
+        position: absolute;
+        top: 50vh;
+        right: 3vw;
+        width: 23vw;
+        height: 23vw;
+        border-radius: 50%;
+        opacity: 0.4;
+        background-color: gray;
+    }
+    .controls-bomb img {
+        position: absolute;
+        top: 50%;
+        margin-top: -10vw;
+        left: 50%;
+        margin-left: -10vw;
+        width: 20vw;
+        height: 20vw;
+        display: block;
+    }
+    .controls-bomb-pressed {
+        background-color: yellow;
+    }
+}
+@media screen and (orientation: portrait) {
+    body {
+        background-color: #ceced2;
+        text-align: center;
+    }
+
+    /***************************/
+    .prompt-wrapper {
+        display: none;
+        width: 40vw;
+        height: 30vw;
+        margin: 50vw auto 0;
+        border: 1px solid grey;
+        border-radius: 1vw;
+        font-size: 5vw;
+        text-align: center;
+        background-color: #decc4d;
+        z-index: 9999;
+    }
+    .prompt-wrapper input[type=text] {
+        display: block;
+        width: 30vw;
+        height: 7vw;
+        margin: 0 auto;
+        border: 2px solid blue;
+        border-radius: 0.5vw;
+        font-size: 5vw;
+    }
+    .prompt-wrapper input[type=text]:focus {
+        outline: none;
+        border: 2px solid red;
+    }
+    .prompt-wrapper-ok {
+        display: block;
+        width: 20vw;
+        height: 7vw;
+        margin: 2vw auto;
+        border-radius: 1vw;
+        font-size: 5vw;
+    }
+    .prompt-wrapper-ok:focus {
+        outline: none;
+    }
+
+    /****************************************/
+
+    .main-logo {
+        width: 75vw;
+        height: 25vw;
+        margin: 15vw auto 0;
+        background: url(../images/title_titletext.png) no-repeat; /*center fixed;*/
+        background-size: cover;
+    }
+    .info-wrapper {
+        height: 90vw;
+        width: 80vw;
+        margin: 0 auto;
+        background-color: #737070;
+        border-radius: 1vw;
+        display: none;
+        padding: 2vw 2vw;
+        color: #ffffff;
+        font-size: 5vw;
+        text-align: justify;
+        /*animation: MyAnimation 1s linear infinite;*/
+    }
+    .info-wrapper h2, .info-wrapper p, .info-wrapper h3 {
+        margin: 1vw;
+    }
+
+    .record-wrapper {
+        display: none;
+        height: 25vw;
+        width: 80vw;
+        margin: 5vw auto;
+        text-align: center;
+
+    }
+    .record-table {
+        width: 70vw;
+        margin: 0 auto;
+        font-size: 5vw;
+
+    }
+
+    .record-table table, .record-table th, .record-table td {
+        border: 3px solid black;
+    }
+    .record-table caption {
+        font-weight: bold;
+        font-size: 7vw;
+    }
+
+    .record-table tr:hover {background-color: #596567}
+
+    .menu-wrapper {
+        margin-top: 20vw;
+    }
+
+    .main-menu {
+    }
+
+    .main-menu ul {
+        list-style-type: none;
+    }
+
+    .main-menu li {
+        margin: 0 auto;
+        width: 60vw;
+    }
+
+    .main-menu li a {
+        display: block;
+        color: #ffffff;
+        padding: 3vw 1vw;
+        text-decoration: none;
+        font-size: 9vw; /* Размер текста */
+    }
+    .startplay {
+        display: none;
+    }
+
+    .main-menu li a:hover {
+        color: #f8522c;
+    }
+
+    .game {
+        display: none;
+    }
+    .if-portrait {
+        position: absolute;
+        display: block;
+        left: calc(50% - 43vw);
+        top: calc(50% - 20vh);
+        width: 80vw;
+        height: 20vh;
+        line-height: 20vh;
+        text-align: center;
+
+        font-size: 6vw; /* Размер текста */
+        color: white;
+
+        /*border: 1px solid blue;*/
+    }
+}
+
+
+

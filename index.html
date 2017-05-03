@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <script
+            src="http://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous"></script>
+    <title>Bomberman</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type='text/javascript' src='Sourse/classList.js'></script>
+    <script type='text/javascript' src='Model/GameModel.js'></script>
+    <script type='text/javascript' src='Model/AJAXStorage.js'></script>
+    <script type='text/javascript' src='Model/SceneModel.js'></script>
+    <script type='text/javascript' src='Model/GhostModel.js'></script>
+    <script type='text/javascript' src='Model/BombermanModel.js'></script>
+    <script type='text/javascript' src='Model/BombModel.js'></script>
+    <script type='text/javascript' src='Model/FireModel.js'></script>
+
+    <script type='text/javascript' src='View/SceneView.js'></script>
+    <script type='text/javascript' src='View/GhostView.js'></script>
+    <script type='text/javascript' src='View/BombermanView.js'></script>
+    <script type='text/javascript' src='View/BombView.js'></script>
+    <script type='text/javascript' src='View/FireView.js'></script>
+    <script type='text/javascript' src='View/Animation.js'></script>
+
+    <script type='text/javascript' src='Controller/BombermanController.js'></script>
+</head>
+<body>
+<div class="prompt-wrapper">
+    <span>Enter your name</span>
+    <input class="prompt-wrapper-text" name="text" type="text">
+    <button class="prompt-wrapper-ok">ОK</button>
+</div>
+<div class="main">
+    <div class="main-logo"></div>
+    <div class="info-wrapper"></div>
+    <div class="record-wrapper"></div>
+    <div class="menu-wrapper">
+        <div class="main-menu">
+            <ul>
+                <li class="startplay"><a href="#play">Start Play</a></li>
+                <li><a href="#rules">Game Rules</a></li>
+                <li><a href="#records">Records Table</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!--<div class="if-portrait">ROTATE SCREEN TO PLAY</div>-->
+<div class="gamestatus game-over">GAME OVER</div>
+<div class="gamestatus new-level">LEVEL <span class="level-number">1</span></div>
+<div class="game">
+    <table class="info">
+        <tr>
+            <td class="info-timer"><span>Time: </span><span class="time"></span></td>
+            <td class="info-score"><span>Score: </span><span class="score">0</span></td>
+            <td class="info-life"><span>Life: </span><span class="life">2</span></td>
+        </tr>
+    </table>
+    <div class="scene">
+        <canvas class="bomberman">Update your navigator</canvas>
+        <canvas class="bomb">Update your navigator</canvas>
+    </div>
+    <div class="controls">
+        <div class="controls-button up"></div>
+        <div class="controls-button right"></div>
+        <div class="controls-button down"></div>
+        <div class="controls-button left"></div>
+    </div>
+    <div class="controls-bomb">
+        <img src="images/bomb_control.png">
+    </div>
+</div>
+<script>
+    'use strict';
+    var Game;
+    var MainDom = document.querySelector('.main');
+    var Promptwrapper = document.querySelector('.prompt-wrapper');
+    var PromptWrapperOk = document.querySelector('.prompt-wrapper-ok');
+    var MainLogo = document.querySelector('.main-logo');
+    var MenuWrapper = document.querySelector('.menu-wrapper');
+    var InfoWrapper = document.querySelector('.info-wrapper');
+    var RecordWrapper = document.querySelector('.record-wrapper');
+    var GameDomElem = document.querySelector('.game');
+    var GameOverDomElem = document.querySelector('.game-over');
+
+    var CurrentSPAState;
+    var PreviousSPAState;
+    var RecordTable;
+    window.onhashchange = SwitchToStateFromURLHash;
+
+    PromptWrapperOk.addEventListener("click", AddRecordToResultTable );
+
+    var RecordStorage  = new TAjaxStorage( ShowRecordTable );
+    //console.log( 'RecordStorage = ' + RecordStorage );
+    RecordStorage.UpdateRecords( {user: 'pasha', score: 100} );
+
+
+    function AddRecordToResultTable() {
+        //alert('add user!!!');
+        var UserName = Promptwrapper.querySelector('.prompt-wrapper-text').value;
+        console.log('UserName = ' + UserName);
+        var Score = +document.querySelector('.score').innerHTML;
+
+        if (UserName == '') {
+            alert('You do not enter your name!!!');
+            return;
+        }
+
+        var result = {user: UserName, score: Score};
+
+        RecordStorage.UpdateRecords( result );
+        Promptwrapper.style.display = 'none';
+        GameOverDomElem.style.display = 'block';
+    }
+
+    function SwitchToStateFromURLHash() {
+        //alert('Hash Changed!!!');
+        var URLHash = window.location.hash;
+        PreviousSPAState = CurrentSPAState;
+
+        CurrentSPAState = URLHash.substr(1);
+        if ( CurrentSPAState === "" ) CurrentSPAState = 'main';
+        //alert(CurrentSPAState);
+
+        //console.log('Новое состояние приложения:');
+        //console.log(CurrentSPAState);
+
+        switch ( CurrentSPAState )
+        {
+            case 'main' :
+                GoToMain();
+                break;
+            case 'play' : 
+                StartPlay();
+                break;
+            case 'rules' :
+                GoToRules();
+                break;
+            case 'records' :
+                ShowRecords();
+                break;
+            case 'about' :
+                ShowAbout();
+        }
+    }
+
+    /************************************/
+    function GoToMain() {
+        //alert('go to main!!!');
+        if (PreviousSPAState === 'play') {
+            if (Game.gameOver)
+            {
+                GameDomElem.style.display = 'none';
+                GameOverDomElem.style.display = 'none';
+                MainDom.style.display = 'block';
+                MainLogo.style.display = 'block';
+                Game = null;
+                StartGameSound();
+                return;
+            }
+            var DoYouWantToStopGame = confirm("Вы уверены?");
+
+            if ( DoYouWantToStopGame )
+            {
+                GameDomElem.style.display = 'none';
+                GameOverDomElem.style.display = 'none';
+                MainDom.style.display = 'block';
+                Game.StopGame();
+                Game = null;
+                StartGameSound();
+            } else {
+                location.hash = 'play';
+                return;
+            }
+        }
+
+        RecordWrapper.style.display = 'none';
+        InfoWrapper.style.display = 'none';
+        MainLogo.style.display = 'block';
+        MenuWrapper.style.display = 'block';
+
+        if (RecordTable) {
+            RecordWrapper.removeChild(RecordTable);
+            RecordTable = null;
+        }
+
+        StartGameAudio.play();
+
+    }
+    
+    function StartPlay() {
+        //alert('StartPlay!!!');
+        //console.log('Game = ' + Game);
+        //console.log('PreviousSPAState = ' + PreviousSPAState);
+        //if (Game === undefined) alert('Game is lounched!!!');
+        if (Game) {
+            StartGameAudio.pause();
+            return;
+        }
+
+        StartGameAudio.pause();
+        MainDom.style.display = 'none';
+        GameDomElem.style.display = 'block';
+        Game = new TGame();
+        Game.StartGame();
+    }
+    
+    function GoToRules() {
+        //alert('go to Rules!!!');
+        RecordWrapper.style.display = 'none';
+        MenuWrapper.style.display = 'none';
+        InfoWrapper.style.display = 'block';
+
+        LoadData("html/rules.html");
+    }
+    
+    function ShowRecords() {
+        //alert('go to Records!!!');
+        MainLogo.style.display = 'none';
+        MenuWrapper.style.display = 'none';
+        RecordWrapper.style.display = 'block';
+
+        RecordStorage.RestoreRecords();
+
+        //ShowRecordTable(Records);
+    }
+    
+    function ShowAbout() {
+        //alert('go to About!!!');
+        RecordWrapper.style.display = 'none';
+        MenuWrapper.style.display = 'none';
+        InfoWrapper.style.display = 'block';
+        LoadData("html/about.html");
+
+    }
+
+    /********Game Sounds******/
+
+    var StartGameAudio = new Audio;
+
+    if ( StartGameAudio.canPlayType("audio/mpeg") == "probably" || StartGameAudio.canPlayType("audio/mpeg") == "maybe")
+        StartGameAudio.src = "Sounds/startgame.mp3";
+    else
+        StartGameAudio.src = "Sounds/startgame.ogg";
+
+    StartGameAudio.loop = true;
+
+    function StartGameSound() {
+        StartGameAudio.currentTime=0; // в секундах
+        StartGameAudio.play();
+    }
+
+    SwitchToStateFromURLHash();
+
+    /****AJAX******/
+
+    function LoadData(url)
+    {
+        $.ajax( url,
+                { type:'GET', dataType:'html', success:DataLoaded, error:ErrorHandler }
+        );
+    }
+
+    function DataLoaded(data)
+    {
+        InfoWrapper.innerHTML = data;
+    }
+
+    function ErrorHandler(jqXHR,StatusStr,ErrorStr)
+    {
+        alert(StatusStr+' '+ErrorStr);
+    }
+
+    /*var Records = [
+        {user: 'dima', score: 20},
+        {user: 'roma', score: 20},
+        {user: 'vasia', score: 50},
+        {user: 'alex', score: 50},
+        {user: 'dan', score: 100}
+    ];*/
+
+
+    function ShowRecordTable(arr) {
+
+        var RowNumber = (arr.length < 10) ? arr.length-1 : 9;
+
+        RecordTable = document.createElement('table');
+        RecordTable.classList.add('record-table');
+
+        var Caption = document.createElement('caption');
+        Caption.innerHTML = 'TOP 10';
+        RecordTable.appendChild(Caption);
+
+        var trHead = document.createElement('tr');
+        var NameTh = document.createElement('th');
+        var ScoreTh = document.createElement('th');
+
+        NameTh.innerHTML = 'PLAYER';
+        ScoreTh.innerHTML = 'SCORE';
+
+        trHead.appendChild(NameTh);
+        trHead.appendChild(ScoreTh);
+
+        RecordTable.appendChild(trHead);
+
+        for (var i = 0; i <= RowNumber; i++)
+        {
+            var tr = document.createElement('tr');
+            var NameTd = document.createElement('td');
+            var ScoreTd = document.createElement('td');
+
+            NameTd.innerHTML = arr[i].user;
+            ScoreTd.innerHTML = arr[i].score;
+
+            tr.appendChild(NameTd);
+            tr.appendChild(ScoreTd);
+
+            RecordTable.appendChild(tr);
+        }
+
+        RecordWrapper.appendChild(RecordTable);
+    }
+
+
+</script>
+
+</body>
+</html>
