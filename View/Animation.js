@@ -18,7 +18,7 @@ function TAnimation(sprite, startFrame, endFrame, ctx, canvasWidth, canvasHeight
     var CanvasWidth = canvasWidth;
     var CanvasHeight = canvasHeight;
     var BombermanView = bombermanView;
-
+    console.log( bombermanView )
     var animationSequence = [];
     var currentFrame = 0;
     var counter = 0;
@@ -30,10 +30,10 @@ function TAnimation(sprite, startFrame, endFrame, ctx, canvasWidth, canvasHeight
     // обновление анимации
     this.Update = function () {
         // если подошло время смены кадра, то меняем
-        if (counter == (BombermanView.frameSpeed - 1))
+        if (counter == (BombermanView._frameSpeed - 1))
             currentFrame = (currentFrame + 1) % animationSequence.length;
         // обновление счетчика ожидания
-        counter = (counter + 1) % BombermanView.frameSpeed;
+        counter = (counter + 1) % BombermanView._frameSpeed;
     };
 
     this.Draw = function () {
