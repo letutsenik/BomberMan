@@ -5,7 +5,7 @@ function TSpriteSheet(path, frameWidth, frameHeight) {
     this.frameHeight = frameHeight;
 
     // вычисление количества кадров в строке после загрузки изображения
-    var self = this;
+    const self = this;
     this.image.onload = function() {
         self.framesPerRow = Math.floor(self.image.width / self.frameWidth);
     };
@@ -13,35 +13,36 @@ function TSpriteSheet(path, frameWidth, frameHeight) {
     this.image.src = path;
 }
 
-function TAnimation(sprite, startFrame, endFrame, ctx, canvasWidth, canvasHeight, bombermanView) {
-    var Context = ctx;
-    var CanvasWidth = canvasWidth;
-    var CanvasHeight = canvasHeight;
-    var BombermanView = bombermanView;
-    console.log( bombermanView )
-    var animationSequence = [];
-    var currentFrame = 0;
-    var counter = 0;
-
-    // создание последовательности из номеров кадров анимации
-    for (var frameNumber = startFrame; frameNumber <= endFrame; frameNumber++)
-        animationSequence.push(frameNumber);
+class TAnimation {
+    constructor(sprite, startFrame, endFrame, ctx, CanvasWidth, CanvasHeight, view) {
+        this._Context = ctx;
+        this._CanvasWidth = CanvasWidth;
+        this._CanvasHeight = CanvasHeight;
+        this._view = view;
+        this._animationSequence = [];
+        this._currentFrame = 0;
+        this._counter = 0;
+        this._sprite = sprite;
+        // создание последовательности из номеров кадров анимации
+        for (let frameNumber = startFrame; frameNumber <= endFrame; frameNumber++)
+            this._animationSequence.push(frameNumber);
+    }
 
     // обновление анимации
-    this.Update = function () {
+    Update () {
         // если подошло время смены кадра, то меняем
-        if (counter == (BombermanView._frameSpeed - 1))
-            currentFrame = (currentFrame + 1) % animationSequence.length;
+        if (this._counter === (this._view._frameSpeed - 1))
+            this._currentFrame = (this._currentFrame + 1) % this._animationSequence.length;
         // обновление счетчика ожидания
-        counter = (counter + 1) % BombermanView._frameSpeed;
+        this._counter = (this._counter + 1) % this._view._frameSpeed;
     };
 
-    this.Draw = function () {
-        if ( sprite.framesPerRow )
+    Draw () {
+        if ( this._sprite.framesPerRow )
         {
-            Context.clearRect(0,0,64,64);
-            Context.drawImage(sprite.image,0,0,sprite.frameWidth*sprite.framesPerRow,sprite.frameHeight,
-                -currentFrame*CanvasWidth,0,CanvasWidth*sprite.framesPerRow,CanvasHeight);
+            this._Context.clearRect(0, 0, 64, 64);
+            this._Context.drawImage(this._sprite.image,0,0,this._sprite.frameWidth*this._sprite.framesPerRow,this._sprite.frameHeight,
+                - this._currentFrame*this._CanvasWidth,0,this._CanvasWidth*this._sprite.framesPerRow,this._CanvasHeight);
         }
     };
 }
