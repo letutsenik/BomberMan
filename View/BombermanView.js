@@ -1,150 +1,145 @@
 'use strict';
-function TBombermanView() {
-    var self = this;
-    var BombermanModel = null;
-    var SceneDom = null;
-    var SceneModel = null;
+class TBombermanView {
+    constructor() {
+        this._BombermanModel = null;
+        this._SceneDom = null;
+        this._SceneModel = null;
+        
+        this._BombermanImgWidth = null; 
+        this._BombermanImgHeight = null;
 
-    var BombermanImgWidth, BombermanImgHeight;
-    var SceneMarginLeft, SceneWidth, documentWidth;
+        this._SceneMarginLeft = null;
+        this._SceneWidth = null;
+        this._documentWidth = null;
 
-    var BombermanMovePoint; // Точка относительного смещения Scene
-
-    //Анимация
-    self.frameSpeed = 0;
-
-    var animationLeft = null;
-    var animationRight = null;
-    var animationUp = null;
-    var animationDown = null;
-
-
-
-    self.Init = function(BModel,SModel,Scene) {
-        BombermanModel = BModel;
-        SceneModel = SModel;
-        SceneDom = Scene;
-
-        // вычисляем размеры картинки bomberman
-        BombermanImgWidth = SceneDom.offsetWidth / SceneModel.HorzBlocks ;
-        BombermanImgHeight = SceneDom.offsetHeight / SceneModel.VertBlocks;
-        //console.log(BombermanImgWidth);
-        //console.log(BombermanImgHeight);
-
-
-        //self.Elem.src ='images/Bomberman.png';    
-        self.Elem = SceneDom.querySelector('.bomberman');
-        self.Elem.width = BombermanImgWidth;
-        self.Elem.height = BombermanImgHeight;
-        var Context = self.Elem.getContext('2d');
+        this._BombermanMovePoint = null; // Точка относительного смещения Scene
 
         //Анимация
-        var spriteLeft = new TSpriteSheet('images/Bman_left.png', 64, 64);
-        var spriteRight = new TSpriteSheet('images/Bman_right.png', 64, 64);
-        var spriteUp = new TSpriteSheet('images/Bman_up.png', 64, 64);
-        var spriteDown = new TSpriteSheet('images/Bman_down.png', 64, 64);
+        this._frameSpeed = 0;
 
-        animationLeft = new TAnimation(spriteLeft, 0, 7, Context, BombermanImgWidth, BombermanImgHeight, self);
-        animationRight = new TAnimation(spriteRight, 0, 7, Context, BombermanImgWidth, BombermanImgHeight, self);
-        animationUp = new TAnimation(spriteUp, 0, 7, Context, BombermanImgWidth, BombermanImgHeight, self);
-        animationDown = new TAnimation(spriteDown, 0, 7, Context, BombermanImgWidth, BombermanImgHeight, self);
+        this._animationLeft = null;
+        this._animationRight = null;
+        this._animationUp = null;
+        this._animationDown = null;
+
+        this._Elem = null;
+
+        this._lastMovement = null;
+    }
 
 
-        var ScenecomputedStyle = getComputedStyle(SceneDom);
+    Init (BModel, SModel, Scene) {
+        this._BombermanModel = BModel;
+        this._SceneModel = SModel;
+        this._SceneDom = Scene;
 
-        SceneMarginLeft = parseInt(ScenecomputedStyle.marginLeft);
-        //console.log( 'SceneMarginLeft = ' + SceneMarginLeft ); // выведет MarginLeft в пикселях
+        // вычисляем размеры картинки bomberman
+        this._BombermanImgWidth = this._SceneDom.offsetWidth / this._SceneModel.HorzBlocks ;
+        this._BombermanImgHeight = this._SceneDom.offsetHeight / this._SceneModel.VertBlocks;
 
-        SceneWidth = parseInt(ScenecomputedStyle.width);
-        //console.log( 'SceneWidth = ' + SceneWidth ); // выведет SceneWidth в пикселях
+        //this._Elem.src ='images/Bomberman.png';    
+        this._Elem = this._SceneDom.querySelector('.bomberman');
+        this._Elem.width = this._BombermanImgWidth;
+        this._Elem.height = this._BombermanImgHeight;
+        const Context = this._Elem.getContext('2d');
 
-        //console.log( 'SceneHeight = ' + parseInt(ScenecomputedStyle.height) ); // выведет SceneHeight в пикселях
+        //Анимация
+        const spriteLeft = new TSpriteSheet('images/Bman_left.png', 64, 64);
+        const spriteRight = new TSpriteSheet('images/Bman_right.png', 64, 64);
+        const spriteUp = new TSpriteSheet('images/Bman_up.png', 64, 64);
+        const spriteDown = new TSpriteSheet('images/Bman_down.png', 64, 64);
 
-        documentWidth = document.body.offsetWidth;
-        //console.log( 'documentWidth = ' + documentWidth ); // выведет documentWidth в пикселях
-        BombermanMovePoint = (SceneMarginLeft) ? documentWidth*2/3 : documentWidth/2;
+        this._animationLeft = new TAnimation(spriteLeft, 0, 7, Context, this._BombermanImgWidth, this._BombermanImgHeight, this);
+        this._animationRight = new TAnimation(spriteRight, 0, 7, Context, this._BombermanImgWidth, this._BombermanImgHeight, this);
+        this._animationUp = new TAnimation(spriteUp, 0, 7, Context, this._BombermanImgWidth, this._BombermanImgHeight, this);
+        this._animationDown = new TAnimation(spriteDown, 0, 7, Context, this._BombermanImgWidth, this._BombermanImgHeight, this);
 
-        //console.log( (documentWidth*2/3 - SceneMarginLeft) );
+        const ScenecomputedStyle = getComputedStyle(this._SceneDom);
+
+        this._SceneMarginLeft = parseInt(ScenecomputedStyle.marginLeft);
+
+        this._SceneWidth = parseInt(ScenecomputedStyle.width);
+
+        this._documentWidth = document.body.offsetWidth;
+
+        this._BombermanMovePoint = (this._SceneMarginLeft) ? this._documentWidth * 2 / 3 : this._documentWidth / 2;
     };
 
-    self.Update = function() {
-        if (!BombermanModel.PosX) {
-            self.Elem.style.display = 'none';
+    Update () {
+        if (!this._BombermanModel.PosX) {
+            this._Elem.style.display = 'none';
             return;
         }
 
-        var BombermanLeftPos = BombermanModel.PosX * (BombermanImgWidth/SceneModel.BlockWidth);
-        var BombermanTopPos = BombermanModel.PosY * (BombermanImgHeight/SceneModel.BlockHeight);
+        const BombermanLeftPos = this._BombermanModel.PosX * (this._BombermanImgWidth/this._SceneModel.BlockWidth);
+        const BombermanTopPos = this._BombermanModel.PosY * (this._BombermanImgHeight/this._SceneModel.BlockHeight);
 
-        self.Elem.style.left = BombermanLeftPos + 'px';
-        self.Elem.style.top = BombermanTopPos + 'px';
-        self.Elem.style.display = 'block';
+        this._Elem.style.left = BombermanLeftPos + 'px';
+        this._Elem.style.top = BombermanTopPos + 'px';
+        this._Elem.style.display = 'block';
 
         //Анимация
-        switch (BombermanModel.AnimationDirect) {
+        switch (this._BombermanModel.AnimationDirect) {
             case 'down' :
-                self.frameSpeed = 3;
-                self.lastMovement = 'down';
-                animationDown.Update();
-                animationDown.Draw();
+                this._frameSpeed = 3;
+                this._lastMovement = 'down';
+                this._animationDown.Update();
+                this._animationDown.Draw();
                 break;
 
             case 'up' :
-                self.frameSpeed = 3;
-                self.lastMovement = 'up';
-                animationUp.Update();
-                animationUp.Draw();
+                this._frameSpeed = 3;
+                this._lastMovement = 'up';
+                this._animationUp.Update();
+                this._animationUp.Draw();
                 break;
 
             case 'left' :
-                self.frameSpeed = 3;
-                self.lastMovement = 'left';
-                animationLeft.Update();
-                animationLeft.Draw();
+                this._frameSpeed = 3;
+                this._lastMovement = 'left';
+                this._animationLeft.Update();
+                this._animationLeft.Draw();
                 break;
 
             case 'right' :
-                self.frameSpeed = 3;
-                self.lastMovement = 'right';
-                animationRight.Update();
-                animationRight.Draw();
+                this._frameSpeed = 3;
+                this._lastMovement = 'right';
+                this._animationRight.Update();
+                this._animationRight.Draw();
                 break;
             case 'stop' :
-                self.frameSpeed = 0;
-                if (self.lastMovement === 'down') animationDown.Draw();
-                if (self.lastMovement === 'up') animationUp.Draw();
-                if (self.lastMovement === 'left') animationLeft.Draw();
-                if (self.lastMovement === 'right') animationRight.Draw();
-                if (!self.lastMovement) animationDown.Draw();
+                this._frameSpeed = 0;
+                if (this._lastMovement === 'down') this._animationDown.Draw();
+                if (this._lastMovement === 'up') this._animationUp.Draw();
+                if (this._lastMovement === 'left') this._animationLeft.Draw();
+                if (this._lastMovement === 'right') this._animationRight.Draw();
+                if (!this._lastMovement) this._animationDown.Draw();
                 break;
         }
 
-        //console.log( 'BombermanLeftPos = ' + BombermanLeftPos );
-
-        var ScenecomputedStyle = getComputedStyle(SceneDom);
+        const ScenecomputedStyle = getComputedStyle(this._SceneDom);
         //Двигаем сцену
-        if (BombermanLeftPos > (BombermanMovePoint - SceneMarginLeft) && BombermanModel.SpeedX > 0 ) {
-            //console.log('MarginScene!!!');
-            if (parseInt(ScenecomputedStyle.marginLeft) > (documentWidth - SceneWidth)) {
-                SceneDom.style.marginLeft = parseInt(ScenecomputedStyle.marginLeft) -
-                    BombermanModel.SpeedX * (BombermanImgWidth / SceneModel.BlockWidth) + 'px';
+        if (BombermanLeftPos > (this._BombermanMovePoint - this._SceneMarginLeft) && this._BombermanModel.SpeedX > 0 ) {
+            if (parseInt(ScenecomputedStyle.marginLeft) > (this._documentWidth - this._SceneWidth)) {
+                this._SceneDom.style.marginLeft = parseInt(ScenecomputedStyle.marginLeft) -
+                    this._BombermanModel.SpeedX * (this._BombermanImgWidth / this._SceneModel.BlockWidth) + 'px';
             }
         }
-        if (BombermanLeftPos - SceneMarginLeft < (BombermanMovePoint - SceneMarginLeft) && BombermanModel.SpeedX < 0 ) {
+        if (BombermanLeftPos - this._SceneMarginLeft < (this._BombermanMovePoint - this._SceneMarginLeft) && this._BombermanModel.SpeedX < 0 ) {
 
-            if (parseInt(ScenecomputedStyle.marginLeft) < SceneMarginLeft)
+            if (parseInt(ScenecomputedStyle.marginLeft) < this._SceneMarginLeft)
             {
-                SceneDom.style.marginLeft = parseInt(ScenecomputedStyle.marginLeft) -
-                    BombermanModel.SpeedX * (BombermanImgWidth/SceneModel.BlockWidth) + 'px';
+                this._SceneDom.style.marginLeft = parseInt(ScenecomputedStyle.marginLeft) -
+                    this._BombermanModel.SpeedX * (this._BombermanImgWidth/this._SceneModel.BlockWidth) + 'px';
             }
         }
     };
     
-    self.MoveSceneToStart = function () {
-        SceneDom.classList.add('scene-animated-move');
-        SceneDom.style.marginLeft = SceneMarginLeft + 'px';
+    MoveSceneToStart () {
+        this._SceneDom.classList.add('scene-animated-move');
+        this._SceneDom.style.marginLeft = this._SceneMarginLeft + 'px';
         setTimeout(function () {
-            SceneDom.classList.remove('scene-animated-move');
+            this._SceneDom.classList.remove('scene-animated-move');
         }, 2000);
     }
 }
