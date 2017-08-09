@@ -1,121 +1,115 @@
 'use strict';
-function TGhostView() {
-    var self = this;
-    var GhostModel = null;
-    var SceneDom = null;
-    var SceneModel = null;
-    var GhostImgWidth, GhostImgHeight;
-
-    //Анимация
-    self.frameSpeed = 0;
-    var spriteLeft = null;
-    var spriteRight = null;
-    var spriteUp = null;
-    var spriteDown = null;
-
-    var animationLeft = null;
-    var animationRight = null;
-    var animationUp = null;
-    var animationDown = null;
-
-    self.Init = function(GModel,SModel,Scene) {
-        GhostModel = GModel;
-        SceneModel = SModel;
-        SceneDom = Scene;
-
-        // вычисляем размеры картинки
-        GhostImgWidth = SceneDom.offsetWidth / SceneModel.HorzBlocks ;
-        GhostImgHeight = SceneDom.offsetHeight / SceneModel.VertBlocks;
-        //console.log(GhostImgWidth);
-        //console.log(GhostImgHeight);
-
-        /*GhostModel.Elem = document.createElement('img');
-        GhostModel.Elem.style.position='absolute';
-        GhostModel.Elem.src ='images/Ghost.png';
-        GhostModel.Elem.style.width = GhostImgWidth + 'px';
-        GhostModel.Elem.style.height = GhostImgHeight + 'px';
-         SceneDom.appendChild(GhostModel.Elem);*/
-
-        self.Elem = document.createElement('canvas');
-        self.Elem.classList.add('ghost');
-        self.Elem.width = GhostImgWidth;
-        self.Elem.height = GhostImgHeight;
-        SceneDom.appendChild(self.Elem);
-        var Context = self.Elem.getContext('2d');
+class TGhostView {
+    constructor() {
+        this._GhostModel = null;
+        this._SceneDom = null;
+        this._SceneModel = null;
+        this._GhostImgWidth = null;
+        this._GhostImgHeight = null;
 
         //Анимация
-        spriteLeft = new TSpriteSheet('images/Ghost_left.png', 64, 64);
-        spriteRight = new TSpriteSheet('images/Ghost_right.png', 64, 64);
-        spriteUp = new TSpriteSheet('images/Ghost_up.png', 64, 64);
-        spriteDown = new TSpriteSheet('images/Ghost_down.png', 64, 64);
+        this._frameSpeed = 0;
+        this._spriteLeft = null;
+        this._spriteRight = null;
+        this._spriteUp = null;
+        this._spriteDown = null;
 
-        animationLeft = new TAnimation(spriteLeft, 0, 6, Context, GhostImgWidth, GhostImgHeight, self);
-        animationRight = new TAnimation(spriteRight, 0, 6, Context, GhostImgWidth, GhostImgHeight, self);
-        animationUp = new TAnimation(spriteUp, 0, 5, Context, GhostImgWidth, GhostImgHeight, self);
-        animationDown = new TAnimation(spriteDown, 0, 5, Context, GhostImgWidth, GhostImgHeight, self);
+        this._animationLeft = null;
+        this._animationRight = null;
+        this._animationUp = null;
+        this._animationDown = null;
+
+        this._Elem = null;
+        this._lastMovement = null;
+    }
+
+    Init (GModel, SModel, Scene) {
+        this._GhostModel = GModel;
+        this._SceneModel = SModel;
+        this._SceneDom = Scene;
+
+        // вычисляем размеры картинки
+        this._GhostImgWidth = this._SceneDom.offsetWidth / this._SceneModel.HorzBlocks ;
+        this._GhostImgHeight = this._SceneDom.offsetHeight / this._SceneModel.VertBlocks;
+
+        this._Elem = document.createElement('canvas');
+        this._Elem.classList.add('ghost');
+        this._Elem.width = this._GhostImgWidth;
+        this._Elem.height = this._GhostImgHeight;
+        this._SceneDom.appendChild(this._Elem);
+        const Context = this._Elem.getContext('2d');
+
+        //Анимация
+        this._spriteLeft = new TSpriteSheet('images/Ghost_left.png', 64, 64);
+        this._spriteRight = new TSpriteSheet('images/Ghost_right.png', 64, 64);
+        this._spriteUp = new TSpriteSheet('images/Ghost_up.png', 64, 64);
+        this._spriteDown = new TSpriteSheet('images/Ghost_down.png', 64, 64);
+
+        this._animationLeft = new TAnimation(this._spriteLeft, 0, 6, Context, this._GhostImgWidth, this._GhostImgHeight, this);
+        this._animationRight = new TAnimation(this._spriteRight, 0, 6, Context, this._GhostImgWidth, this._GhostImgHeight, this);
+        this._animationUp = new TAnimation(this._spriteUp, 0, 5, Context, this._GhostImgWidth, this._GhostImgHeight, this);
+        this._animationDown = new TAnimation(this._spriteDown, 0, 5, Context, this._GhostImgWidth, this._GhostImgHeight, this);
 
     };
 
-    self.Update = function() {
-        //if (!GhostModel.PosX) SceneDom.removeChild(self.Elem);
-        if (!self.Elem) return;
-        //SceneDom.removeChild(self.Elem);
-        //console.log('Delete Ghost!!!');
-        self.Elem.style.left = GhostModel.PosX * (GhostImgWidth/SceneModel.BlockWidth) + 'px';
-        self.Elem.style.top = GhostModel.PosY * (GhostImgHeight/SceneModel.BlockHeight) + 'px';
+    Update () {
+        if (!this._Elem) return;
+
+        this._Elem.style.left = this._GhostModel.PosX * (this._GhostImgWidth/this._SceneModel.BlockWidth) + 'px';
+        this._Elem.style.top = this._GhostModel.PosY * (this._GhostImgHeight/this._SceneModel.BlockHeight) + 'px';
 
         //Анимация
-        switch (GhostModel.AnimationDirect) {
+        switch (this._GhostModel.AnimationDirect) {
             case 'down' :
-                self.frameSpeed = 3;
-                self.lastMovement = 'down';
-                animationDown.Update();
-                animationDown.Draw();
+                this._frameSpeed = 3;
+                this._lastMovement = 'down';
+                this._animationDown.Update();
+                this._animationDown.Draw();
                 break;
 
             case 'up' :
-                self.frameSpeed = 3;
-                self.lastMovement = 'up';
-                animationUp.Update();
-                animationUp.Draw();
+                this._frameSpeed = 3;
+                this._lastMovement = 'up';
+                this._animationUp.Update();
+                this._animationUp.Draw();
                 break;
 
             case 'left' :
-                self.frameSpeed = 3;
-                self.lastMovement = 'left';
-                animationLeft.Update();
-                animationLeft.Draw();
+                this._frameSpeed = 3;
+                this._lastMovement = 'left';
+                this._animationLeft.Update();
+                this._animationLeft.Draw();
                 break;
 
             case 'right' :
-                self.frameSpeed = 3;
-                self.lastMovement = 'right';
-                animationRight.Update();
-                animationRight.Draw();
+                this._frameSpeed = 3;
+                this._lastMovement = 'right';
+                this._animationRight.Update();
+                this._animationRight.Draw();
                 break;
             case 'stop' :
-                self.frameSpeed = 0;
-                if (self.lastMovement === 'down') animationDown.Draw();
-                if (self.lastMovement === 'up') animationUp.Draw();
-                if (self.lastMovement === 'left') animationLeft.Draw();
-                if (self.lastMovement === 'right') animationRight.Draw();
-                if (!self.lastMovement) animationDown.Draw();
+                this._frameSpeed = 0;
+                if (this._lastMovement === 'down') this._animationDown.Draw();
+                if (this._lastMovement === 'up') this._animationUp.Draw();
+                if (this._lastMovement === 'left') this._animationLeft.Draw();
+                if (this._lastMovement === 'right') this._animationRight.Draw();
+                if (!this._lastMovement) this._animationDown.Draw();
                 break;
         }
     };
 
-    self.RemoveElem = function () {
-        SceneDom.removeChild(self.Elem);
-        self.Elem = null;
+    RemoveElem () {
+        this._SceneDom.removeChild(this._Elem);
+        this._Elem = null;
         //Чистим память
-        spriteLeft = null;
-        spriteRight = null;
-        spriteUp = null;
-        spriteDown = null;
+        this._spriteLeft = null;
+        this._spriteRight = null;
+        this._spriteUp = null;
+        this._spriteDown = null;
 
-        animationLeft = null;
-        animationRight = null;
-        animationUp = null;
-        animationDown = null;
+        this._animationLeft = null;
+        this._animationRight = null;
+        this._animationUp = null;
+        this._animationDown = null;
     };
 }
