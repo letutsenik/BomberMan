@@ -1,51 +1,55 @@
 'use strict';
-function TBombView() {
-    var self = this;
-    var BombModel = null;
-    var SceneModel = null;//!!!!
-    var SceneDom = null;
+class TBombView {
+    constructor() {
+        this._BombModel = null;
+        this._SceneModel = null;//!!!!
+        this._SceneDom = null;
 
-    var BombImgWidth, BombImgHeight;
-
-    //Анимация
-    self.frameSpeed = 3;
-    var animation = null;
-
-    self.Init = function (BombMod, SceneMod, Scene) {
-        BombModel = BombMod;
-        SceneModel = SceneMod; //!!!
-        SceneDom = Scene;
-
-        // вычисляем размеры картинки
-        BombImgWidth = SceneDom.offsetWidth / SceneModel.HorzBlocks ;
-        BombImgHeight = SceneDom.offsetHeight / SceneModel.VertBlocks;
-
-        self.Elem = document.querySelector('.bomb');
-        self.Elem.width = BombImgWidth;
-        self.Elem.height = BombImgHeight;
-        var Context = self.Elem.getContext('2d');
+        this._BombImgWidth = null;
+        this._BombImgHeight = null;
 
         //Анимация
-        var sprite = new TSpriteSheet('images/bomb_sprite.png', 48, 48);
-        animation = new TAnimation(sprite, 0, 2, Context, BombImgWidth, BombImgHeight, self);
+        this._frameSpeed = 3;
+        this._animation = null;
+
+        this._Elem = null;
+    }
+   
+
+    Init (BombMod, SceneMod, Scene) {
+        this._BombModel = BombMod;
+        this._SceneModel = SceneMod; //!!!
+        this._SceneDom = Scene;
+
+        // вычисляем размеры картинки
+        this._BombImgWidth = this._SceneDom.offsetWidth / this._SceneModel.HorzBlocks ;
+        this._BombImgHeight = this._SceneDom.offsetHeight / this._SceneModel.VertBlocks;
+
+        this._Elem = document.querySelector('.bomb');
+        this._Elem.width = this._BombImgWidth;
+        this._Elem.height = this._BombImgHeight;
+        const Context = this._Elem.getContext('2d');
+
+        //Анимация
+        const sprite = new TSpriteSheet('images/bomb_sprite.png', 48, 48);
+        this._animation = new TAnimation(sprite, 0, 2, Context, this._BombImgWidth, this._BombImgHeight, this);
     };
 
-    self.Update = function() {
-        if (BombModel.PosX)
-        {
-            var BombLeftPos = BombModel.PosX * (BombImgWidth/SceneModel.BlockWidth);
-            var BombTopPos = BombModel.PosY * (BombImgHeight/SceneModel.BlockHeight);
+    Update () {
+        if (this._BombModel.PosX) {
+            const BombLeftPos = this._BombModel.PosX * (this._BombImgWidth/this._SceneModel.BlockWidth);
+            const BombTopPos = this._BombModel.PosY * (this._BombImgHeight/this._SceneModel.BlockHeight);
 
-            self.Elem.style.display = 'block';
-            self.Elem.style.left = BombLeftPos + 'px';
-            self.Elem.style.top = BombTopPos + 'px';
+            this._Elem.style.display = 'block';
+            this._Elem.style.left = BombLeftPos + 'px';
+            this._Elem.style.top = BombTopPos + 'px';
 
             //Анимация
-            animation.Update();
-            animation.Draw();
+            this._animation.Update();
+            this._animation.Draw();
         } else
         {
-            self.Elem.style.display = 'none';
+            this._Elem.style.display = 'none';
         }
     };
 }
